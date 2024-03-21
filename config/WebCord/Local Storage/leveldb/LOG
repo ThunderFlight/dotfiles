@@ -1,6 +1,0 @@
-2024/01/19-23:33:34.767 17052 Reusing MANIFEST /home/cosmo/.config/WebCord/Local Storage/leveldb/MANIFEST-000001
-2024/01/19-23:33:34.949 17052 Recovering log #3
-2024/01/19-23:33:35.015 17052 Reusing old log /home/cosmo/.config/WebCord/Local Storage/leveldb/000003.log 
-2024/01/19-23:35:40.036 17053 Level-0 table #5: started
-2024/01/19-23:35:40.106 17053 Level-0 table #5: 37437 bytes OK
-2024/01/19-23:35:40.185 17053 Delete type=0 #3
