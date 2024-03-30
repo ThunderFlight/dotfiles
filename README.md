@@ -3,7 +3,7 @@ Install all needed packages
 ```bash
 sudo pacman -S --needed hyprland waybar dunst neovim lua lxappearance tmux kitty qutebrowser \
                         pipewire pipewire-pulse wireplumber xdg-desktop-portal-hyprland brightnessctl wpa_supplicant \
-                        noto-fonts-cjk noto-fonts-emoji noto-fonts ttf-jetbrains-mono ttf-icomoon-feather
+                        noto-fonts-cjk noto-fonts-emoji noto-fonts ttf-jetbrains-mono ttf-icomoon-feather ttf-jetbrains-mono-nerd
 ```
 
 Aur
