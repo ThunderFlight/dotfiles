@@ -23,11 +23,18 @@
   "modules-right": [
     "network",
     "pulseaudio",
+    "pulseaudiomic",
     "backlight",
     "clock"
   ],
   // Modules configuration
   "clock": {
+    "format": " {:%H <span foreground='#89b4fa'>󰇙</span> %M}",
+    "tooltip": "true",
+    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+    "format-alt": " {:%d/%m}"
+  },
+  "clockm": {
     "format": " {:%H <span foreground='#89b4fa'>󰇙</span> %M}",
     "tooltip": "true",
     "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
@@ -149,6 +156,12 @@
     ]
     //	"on-scroll-up":,
     //	"on-scroll-down":,
+  },
+  "pulseaudiomic": {
+    "format": "{icon}",
+    "on-click": "bash ~/.scripts/volume microph",
+    "format-source": "󰍬",
+    "format-muted": "󰍭"
   },
   "pulseaudio": {
     "format": "{icon} {volume}%",

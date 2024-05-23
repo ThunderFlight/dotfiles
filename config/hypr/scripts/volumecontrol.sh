@@ -2,6 +2,7 @@
 
 tagVol="notifyvol"
 
+
 function notify_vol
 {
     vol=`pamixer --get-volume | cat`
@@ -25,6 +26,7 @@ function notify_vol
         dunstify -i $ico "Volume: ${vol}%" -a "$sink" -u low -r 91190 -t 800
     fi
 }
+
 
 case $1 in
     i) pamixer -i 5

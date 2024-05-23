@@ -57,6 +57,7 @@ window#waybar.hidden {
 #temperature,
 #backlight,
 #network,
+#pulseaudiomic,
 #pulseaudio,
 #custom-media,
 #tray,
@@ -151,16 +152,20 @@ window#waybar.hidden {
 }
 
 /* If workspaces is the leftmost module, omit left margin */
-.modules-left > widget:first-child > #workspaces {
+.modules-left>widget:first-child>#workspaces {
   margin-left: 0;
 }
 
 /* If workspaces is the rightmost module, omit right margin */
-.modules-right > widget:last-child > #workspaces {
+.modules-right>widget:last-child>#workspaces {
   margin-right: 0;
 }
 
 #pulseaudio {
+  color: #7d9bba;
+}
+
+#pulseaudiomic {
   color: #7d9bba;
 }
 
@@ -253,11 +258,11 @@ label:focus {
   background-color: #eb4d4b;
 }
 
-#tray > .passive {
+#tray>.passive {
   -gtk-icon-effect: dim;
 }
 
-#tray > .needs-attention {
+#tray>.needs-attention {
   -gtk-icon-effect: highlight;
   background-color: #eb4d4b;
 }
@@ -303,7 +308,7 @@ label:focus {
   min-width: 16px;
 }
 
-#keyboard-state > label {
+#keyboard-state>label {
   padding: 0 5px;
 }
 
@@ -314,6 +319,6 @@ label:focus {
   color: #abb2bf;
 }
 
-#keyboard-state > label.locked {
+#keyboard-state>label.locked {
   background: rgba(0, 0, 0, 0.2);
 }
