@@ -1,152 +1,190 @@
 Constants = require("config.constants")
-Customize = require("config.customize")
-Is_Enabled = require("config.functions").is_enabled
 
 return {
-	-- {{{ nvim-cmp
-	{
-		"hrsh7th/nvim-cmp",
-		event = "InsertEnter",
-		enabled = Is_Enabled("nvim-cmp"),
-		version = false,
-		dependencies = {
-			"hrsh7th/cmp-buffer",
-			"hrsh7th/cmp-calc",
-			"hrsh7th/cmp-cmdline",
-			"hrsh7th/cmp-nvim-lua",
-			"hrsh7th/cmp-nvim-lsp-document-symbol",
-			"hrsh7th/cmp-nvim-lsp",
-			"hrsh7th/cmp-path",
-			"saadparwaiz1/cmp_luasnip",
-		},
-		opts = function(_, opts)
-			local cmp = require("cmp")
-			local luasnip = require("luasnip")
+  -- {{{ nvim-cmp
+  {
+    "hrsh7th/nvim-cmp",
+    event = "InsertEnter",
+    version = false,
+    dependencies = {
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-cmdline",
+      "hrsh7th/cmp-nvim-lua",
+      "hrsh7th/cmp-nvim-lsp-document-symbol",
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-calc",
 
-			local check_backspace = function()
-				local col = vim.fn.col(".") - 1
-				return col == 0 or vim.fn.getline("."):sub(col, col):match("%s")
-			end
+      "hrsh7th/cmp-path",
+    },
+    opts = function(_, opts)
+      local cmp = require("cmp")
+      local luasnip = require("luasnip")
 
-			local completion = {
-				completeopt = "menu,menuone,noselect",
-				keyword_length = 1,
-			}
+      local check_backspace = function()
+        local col = vim.fn.col(".") - 1
+        return col == 0 or vim.fn.getline("."):sub(col, col):match("%s")
+      end
 
-			local snippet = {
-				expand = function(args)
-					luasnip.lsp_expand(args.body)
-				end,
-			}
+      local completion = {
+        completeopt = "menu,menuone,noselect",
+        -- keyword_length = 1,
+      }
 
-			local formatting = {
-				fields = { "kind", "abbr", "menu" },
-				format = function(entry, vim_item)
-					vim_item.kind = string.format("%s", Constants.icons.kind[vim_item.kind])
-					vim_item.menu = (Constants.completion.source_mapping)[entry.source.name]
-					return vim_item
-				end,
-			}
+      local snippet = {
+        expand = function(args)
+          luasnip.lsp_expand(args.body)
+        end,
+      }
 
-			local confirm_opts = {
-				behavior = cmp.ConfirmBehavior.Replace,
-				select = false,
-			}
+      local formatting = {
+        -- default fields order i.e completion word + item.kind + item.kind icons fields = field_arrangement[cmp_style] or { "abbr", "kind", "menu" },
+        format = function(_, item)
+          local icon = (Constants.icons.kind and Constants.icons.kind[item.kind]) or ""
 
-			local mapping = {
-				["<C-k>"] = cmp.mapping.select_prev_item(),
-				["<C-j>"] = cmp.mapping.select_next_item(),
-				["<C-b>"] = cmp.mapping(cmp.mapping.scroll_docs(-2), { "i", "c" }),
-				["<C-f>"] = cmp.mapping(cmp.mapping.scroll_docs(2), { "i", "c" }),
-				["<C-Space>"] = cmp.mapping(cmp.mapping.complete(), { "i", "c" }),
-				["<C-y>"] = cmp.config.disable,
-				["<C-e>"] = cmp.mapping({
-					i = cmp.mapping.abort(),
-					c = cmp.mapping.close(),
-				}),
-				["<CR>"] = cmp.mapping.confirm({ select = true }),
-				["<Tab>"] = cmp.mapping(function(fallback)
-					if cmp.visible() then
-						cmp.select_next_item()
-					elseif luasnip.expandable() then
-						luasnip.expand()
-					elseif luasnip.expand_or_jumpable() then
-						luasnip.expand_or_jump()
-					elseif check_backspace() then
-						fallback()
-					else
-						fallback()
-					end
-				end, { "i", "s" }),
-				["<S-Tab>"] = cmp.mapping(function(fallback)
-					if cmp.visible() then
-						cmp.select_prev_item()
-					elseif luasnip.jumpable(-1) then
-						luasnip.jump(-1)
-					else
-						fallback()
-					end
-				end, { "i", "s" }),
-			}
+          item.kind = icon .. (item.kind or "??")
 
-			local window = {
-				completion = cmp.config.window.bordered(),
-				documentation = cmp.config.window.bordered(),
-			}
+          return item
+        end,
+      }
 
-			local experimental = {
-				ghost_text = true,
-			}
+      local confirm_opts = {
+        behavior = cmp.ConfirmBehavior.Replace,
+        select = false,
+      }
 
-			cmp.setup.filetype("gitcommit", {
-				sources = cmp.config.sources({
-					{ name = "cmp_git" },
-				}, {
-					{ name = "buffer" },
-				}),
-			})
+      local mapping = {
+        ["<C-k>"] = cmp.mapping.select_prev_item(),
+        ["<C-j>"] = cmp.mapping.select_next_item(),
+        ["<C-b>"] = cmp.mapping(cmp.mapping.scroll_docs(-2), { "i", "c" }),
+        ["<C-f>"] = cmp.mapping(cmp.mapping.scroll_docs(2), { "i", "c" }),
+        ["<C-Space>"] = cmp.mapping(cmp.mapping.complete(), { "i", "c" }),
+        ["<C-y>"] = cmp.config.disable,
+        ["<C-e>"] = cmp.mapping({
+          i = cmp.mapping.abort(),
+          c = cmp.mapping.close(),
+        }),
+        ["<CR>"] = cmp.mapping.confirm({ select = true }),
+        ["<C-CR>"] = cmp.mapping.confirm({ select = true }),
+        ["<Tab>"] = cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp.select_next_item()
+          elseif luasnip.expandable() then
+            luasnip.expand()
+          elseif luasnip.expand_or_jumpable() then
+            luasnip.expand_or_jump()
+          elseif check_backspace() then
+            fallback()
+          else
+            fallback()
+          end
+        end, { "i", "s" }),
+        ["<S-Tab>"] = cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp.select_prev_item()
+          elseif luasnip.jumpable(-1) then
+            luasnip.jump(-1)
+          else
+            fallback()
+          end
+        end, { "i", "s" }),
+      }
 
-			cmp.setup.cmdline(":", {
-				mapping = cmp.mapping.preset.cmdline(),
-				sources = cmp.config.sources({
-					{ name = "path" },
-				}, {
-					{ name = "cmdline" },
-				}),
-			})
+      local window = {
+        completion = cmp.config.window.bordered(),
+        documentation = cmp.config.window.bordered(),
+      }
 
-			cmp.setup.cmdline({ "/", "?" }, {
-				mapping = cmp.mapping.preset.cmdline(),
-				sources = {
-					{ name = "buffer" },
-				},
-			})
+      local experimental = {
+        ghost_text = true,
+      }
 
-			opts.completion = completion
-			opts.snippet = snippet
-			opts.confirm_opts = confirm_opts
-			opts.formatting = formatting
-			opts.mapping = mapping
-			opts.sources = Constants.completion.sources
-			opts.window = window
-			opts.experimental = experimental
-		end,
-	},
-	-- --------------------------------------------------------------------- }}}
-	-- {{{ LuaSnip
-	{
-		"L3MON4D3/LuaSnip",
-		dependencies = {
-			"rafamadriz/friendly-snippets",
-			config = function()
-				require("luasnip.loaders.from_vscode").lazy_load()
-				require("luasnip.loaders.from_snipmate").lazy_load()
-			end,
-		},
-		opts = {
-			history = true,
-			delete_check_events = "TextChanged",
-		},
-	},
-	-- --------------------------------------------------------------------- }}}
+      cmp.setup.filetype("gitcommit", {
+        sources = cmp.config.sources({
+          { name = "cmp_git" },
+        }, {
+          { name = "buffer" },
+        }),
+      })
+
+      cmp.setup.cmdline(":", {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = cmp.config.sources({
+          { name = "path" },
+        }, {
+          { name = "cmdline" },
+        }),
+      })
+
+      cmp.setup.cmdline({ "/", "?" }, {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = cmp.config.sources({
+          { name = "nvim_lsp_document_symbol" },
+        }, {
+          { name = "buffer" },
+        }),
+      })
+
+      opts.completion = completion
+      opts.snippet = snippet
+      opts.confirm_opts = confirm_opts
+      opts.formatting = formatting
+      opts.mapping = mapping
+      opts.sources = Constants.completion.sources
+      opts.window = window
+      opts.experimental = experimental
+    end,
+  },
+  -- --------------------------------------------------------------------- }}}
+  -- {{{ LuaSnip
+  {
+    "L3MON4D3/LuaSnip",
+    dependencies = {
+      "saadparwaiz1/cmp_luasnip",
+    },
+    keys = {
+      {
+        "<C-j>",
+        function()
+          require("luasnip").jump(1)
+        end,
+        noremap = true,
+        mode = "i",
+      },
+      {
+        "<C-k>",
+        function()
+          require("luasnip").jump(-1)
+        end,
+        noremap = true,
+        mode = "i",
+      },
+      {
+        "<M-n>",
+        function()
+          require("luasnip").change_choice(1)
+        end,
+        noremap = true,
+        mode = { "n", "i", "v" },
+      },
+      {
+        "<M-b>",
+        function()
+          require("luasnip").change_choice(-1)
+        end,
+        noremap = true,
+        mode = { "n", "i", "v" },
+      },
+    },
+    build = "make install_jsregexp",
+    opts = {
+      history = true,
+      delete_check_events = "TextChanged",
+    },
+    config = function()
+      require("luasnip.loaders.from_vscode").lazy_load()
+      require("luasnip.loaders.from_snipmate").lazy_load()
+      require("luasnip.loaders.from_lua").lazy_load({ paths = "~/.config/nvim/snippets" })
+    end,
+  },
+  -- --------------------------------------------------------------------- }}}
 }

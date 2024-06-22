@@ -1,48 +1,76 @@
-local Util = require("lazy.core.util")
-Customize = require("config.customize")
 local M = {}
 
-function M.on_attach(on_attach)
-	vim.api.nvim_create_autocmd("LspAttach", {
-		callback = function(args)
-			local buffer = args.buf
-			local client = vim.lsp.get_client_by_id(args.data.client_id)
-			on_attach(client, buffer)
-		end,
-	})
-end
-
-function M.has(plugin)
-	return require("lazy.core.config").plugins[plugin] ~= nil
-end
-
----@param fn fun()
-function M.on_very_lazy(fn)
-	vim.api.nvim_create_autocmd("User", {
-		pattern = "VeryLazy",
-		callback = function()
-			fn()
-		end,
-	})
-end
-
-function M.opts(name)
-	local plugin = require("lazy.core.config").plugins[name]
-	if not plugin then
-		return {}
-	end
-	local Plugin = require("lazy.core.plugin")
-	return Plugin.values(plugin, "opts", false)
-end
-
+---@param mode string
+---@param lhs string
+---@param rhs string|function
+---@param opts table?
 function M.keymap(mode, lhs, rhs, opts)
-	local options = { noremap = true, silent = true }
-	options = vim.tbl_deep_extend("force", options, opts or {})
-	vim.api.nvim_set_keymap(mode, lhs, rhs, options)
+  local options = { noremap = true, silent = true }
+  options = vim.tbl_deep_extend("force", options, opts or {})
+  vim.keymap.set(mode, lhs, rhs, options)
 end
 
-function M.is_enabled(plugin)
-	return Customize.plugins[plugin].enabled
+local default_notify_options = {
+  title = "Configuration",
+}
+
+local function rewrite_notify_options(options)
+  if not options then
+    return default_notify_options
+  end
+  options.title = options.title or default_notify_options.title
+  return options
+end
+
+---@param text string
+---@param level string | nil
+---@param options table<string, string> | nil
+---@return nil
+function M.notify(text, level, options)
+  level = level or vim.log.levels.INFO
+
+  vim.notify(text, level, rewrite_notify_options(options))
+end
+
+---@param table table
+---@param fn function
+function M.each(table, fn)
+  for k, v in pairs(table) do
+    fn(v, k)
+  end
+end
+
+---@param table table
+function M.set(table, value)
+  return function(key)
+    table[key] = value
+  end
+end
+
+function M.config_files()
+  local config = vim.fn.stdpath("config")
+  local actions = require("telescope.actions")
+  local actions_state = require("telescope.actions.state")
+
+  require("telescope.builtin").find_files({
+    cwd = config,
+    attach_mappings = function(prompt_bufnr)
+      actions.select_default:replace(function()
+        actions.close(prompt_bufnr)
+
+        vim.cmd.edit(actions_state.get_selected_entry().path)
+        vim.fn.chdir(config)
+      end)
+
+      return true
+    end,
+  })
+end
+
+function M.current_buffer_fuzzy_find()
+  require("telescope.builtin").current_buffer_fuzzy_find(
+    require("telescope.themes").get_dropdown({ previewer = false })
+  )
 end
 
 return M

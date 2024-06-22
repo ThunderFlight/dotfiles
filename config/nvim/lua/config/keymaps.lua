@@ -1,10 +1,5 @@
--- {{{ Global definitions
+local map = require("config.functions").keymap
 
-Customize = require("config.customize")
-Functions = require("config.functions")
-Keymap = Functions.keymap
-Is_Enabled = Functions.is_enabled
--- ------------------------------------------------------------------------- }}}
 -- {{{ General mappings
 
 -- Modes
@@ -16,139 +11,111 @@ Is_Enabled = Functions.is_enabled
 -- command_mode =      "c",
 
 -- Better window navigation
-Keymap("n", "<C-h>", "<C-w>h")
-Keymap("n", "<C-j>", "<C-w>j")
-Keymap("n", "<C-k>", "<C-w>k")
-Keymap("n", "<C-l>", "<C-w>l")
-Keymap("n", "sh", "<C-w>h")
-Keymap("n", "sj", "<C-w>j")
-Keymap("n", "sk", "<C-w>k")
-Keymap("n", "sl", "<C-w>l")
+map("n", "<C-h>", "<C-w>h")
+map("n", "<C-j>", "<C-w>j")
+map("n", "<C-k>", "<C-w>k")
+map("n", "<C-l>", "<C-w>l")
 
--- Resize with arrows
-Keymap("n", "<C-S-Up>", "<Cmd>:resize -2<CR>")
-Keymap("n", "<C-S-Down>", "<Cmd>:resize +2<CR>")
-
-Keymap("n", "<C-S-Left>", "<Cmd>:vertical resize -2<CR>")
-Keymap("n", "<C-S-Right>", "<Cmd>:vertical resize +2<CR>")
+-- Resize splits
+map("n", "<M-,>", "<c-w>5>")
+map("n", "<M-.>", "<c-w>5<")
+map("n", "<M-t>", "<C-W>+")
+map("n", "<M-s>", "<C-W>-")
 
 -- Navigate buffers
-Keymap("n", "<S-l>", ":bnext<CR>")
-Keymap("n", "<S-h>", ":bprevious<CR>")
+map("n", "<S-l>", ":bnext<CR>")
+map("n", "<S-h>", ":bprevious<CR>")
 
--- Inc and Dec numbars
-Keymap("n", "+", "<C-a>")
-Keymap("n", "-", "<C-x>")
+-- Inc and Dec numbers
+map("n", "+", "<C-a>")
+map("n", "-", "<C-x>")
 
 -- Splits
-Keymap("n", "<leader>s", ":split<cr><C-w>w")
-Keymap("n", "sv", ":vsplit<cr><C-w>w")
-Keymap("n", "<leader>", "<C-w>w")
+map("n", "<leader>s", ":split<cr><C-w>w")
+map("n", "sv", ":vsplit<cr><C-w>w")
+map("n", "<leader>", "<C-w>w")
 
 -- Select (charwise) the contents of the current line, excluding indentation.
-Keymap("n", "vv", "^vg_")
-
--- Select entire buffer
-Keymap("n", "<C-a>", "ggVG")
-Keymap("n", "<leader>V", "V`]")
+map("n", "vv", "^vg_")
 
 -- Save all files.
-Keymap("n", "<F2>", "<cmd>wall<cr>")
-
--- Delete current buffer.
-if Is_Enabled("vim-bbye") then
-	Keymap("n", "Q", "<cmd>Bdelete!<cr>")
-end
+map("n", "<F2>", "<cmd>wall<cr>")
 
 -- Toggle [in]visible characters.
-Keymap("n", "<leader>i", "<cmd>set list!<cr>")
+map("n", "<leader>i", "<cmd>set list!<cr>")
 
 -- Stay in indent mode.
-Keymap("v", "<", "<gv")
-Keymap("v", ">", ">gv")
+map("v", "<", "<gv")
+map("v", ">", ">gv")
 
 -- Visual yank
-Keymap("v", "<leader>cc", '"+y')
+map("v", "<leader>cc", '"+y')
 
 -- Obfuscate
-Keymap("n", "<F3>", "mmggg?G`m")
+map("n", "<F3>", "mmggg?G`m")
 
 -- Delete
-Keymap("n", "<leader>d", '"_d')
-Keymap("n", "x", '"_x')
-Keymap("n", "dw", 'vb"_d')
+map("n", "<leader>d", '"_d')
+map("n", "x", '"_x')
+map("n", "dw", 'vb"_d')
 
 -- Move text up and down
-Keymap("v", "<A-j>", ":m .+1<CR>==")
-Keymap("v", "<A-k>", ":m .-2<CR>==")
-Keymap("v", "p", '"_dP')
-Keymap("x", "J", ":m '>+1<CR>gv-gv")
-Keymap("x", "K", ":m '<-2<CR>gv-gv")
-Keymap("x", "<A-j>", ":m '>+1<CR>gv-gv")
-Keymap("x", "<A-k>", ":m '<-2<CR>gv-gv")
+map("v", "<A-j>", ":m .+1<CR>==")
+map("v", "<A-k>", ":m .-2<CR>==")
+map("v", "p", '"_dP')
+map("x", "J", ":m '>+1<CR>gv-gv")
+map("x", "K", ":m '<-2<CR>gv-gv")
+map("x", "<A-j>", ":m '>+1<CR>gv-gv")
+map("x", "<A-k>", ":m '<-2<CR>gv-gv")
 
 -- Alternative ESC key to avoid <Ctrl-[>.  Useful when a RCP is used to connect
 -- to a remote host.
-Keymap("i", "jk", "<esc>")
-Keymap("c", "jk", "<esc>")
+map("i", "jk", "<esc>")
+map("c", "jk", "<esc>")
 -- ------------------------------------------------------------------------- }}}
 -- {{{ Folding commands.
 
 -- Close all fold except the current one.
-Keymap("n", "zv", "zMzvzz")
+map("n", "zv", "zMzvzz")
 
 -- Close current fold when open. Always open next fold.
-Keymap("n", "zj", "zcjzOzz")
+map("n", "zj", "zcjzOzz")
 
 -- Close current fold when open. Always open previous fold.
-Keymap("n", "zk", "zckzOzz")
+map("n", "zk", "zckzOzz")
 
 -- ------------------------------------------------------------------------- }}}
 -- {{{ Keep the cursor in place while joining lines.
 
-Keymap("n", "J", "mzJ`z")
-Keymap("n", "<leader>J", "myvipJ`ygq<cr>")
+map("n", "J", "mzJ`z")
+map("n", "<leader>J", "myvipJ`ygq<cr>")
 
 -- ------------------------------------------------------------------------- }}}
 ---- {{{ Shell commands.
 
 -- Execute the current line of test as a shell command.
-Keymap("n", "<localleader>E", [[0mMvg_"ky :exec "r!" getreg("k")<cr>]])
-Keymap("v", "<localleader>E", [["ky :exec "r!" getreg("k")<cr>]])
+map("n", "<localleader>E", [[0mMvg_"ky :exec "r!" getreg("k")<cr>]])
+map("v", "<localleader>E", [["ky :exec "r!" getreg("k")<cr>]])
 
 -- ------------------------------------------------------------------------- }}}
--- {{{ Quit all
-
-Keymap("n", "<c-q>", "<cmd>qall!<cr>")
-Keymap("n", "<leader>qq", "<cmd>qall!<cr>")
-
--- ------------------------------------------------------------------------- }}}
----- {{{ leader + space
-
-Keymap("n", "<leader><space>", "<cmd>nohlsearch<cr>")
-
--- ------------------------------------------------------------------------- }}}
--- {{{ Help
-
-Keymap("n", "<leader>HH", "<cmd>silent vert bo help<cr>")
-
--- ------------------------------------------------------------------------- }}}
--- {{{ L - LSP
-
--- TODO: Finish implementing LSP keybindings.  Some plugins are not installed.
-
-Keymap("n", "<leader>lj", "<cmd>lua vim.diagnostic.goto_next({buffer=0})<cr>")
-Keymap("n", "<leader>lk", "<cmd>lua vim.diagnostic.goto_prev({buffer=0})<cr>")
-Keymap("n", "K", ":lua vim.lsp.buf.hover()<CR>")
-
--- ------------------------------------------------------------------------- }}}
--- {{{ V - Linewise reselection of what you just pasted.
-
-Keymap("n", "<leader>VV", "V`]")
-
--- ------------------------------------------------------------------------- }}}
-vim.keymap.set("n", "gp", function()
-	return "`[" .. vim.fn.strpart(vim.fn.getregtype(), 0, 1) .. "`]"
-end, { expr = true })
-
-vim.keymap.set("i", "<C-Backspace>", "<esc>ciw")
+-- {{{ Keep cursor in the center of the screen when scrolling with C-e or C-y
+map("n", "<leader>to", function()
+  vim.opt.scrolloff = 999 - vim.o.scrolloff
+end)
+-- }}}
+-- {{{ Vim mappings in russian
+-- stylua: ignore
+local langmap_keys = {
+  'ёЁ;`~', '№;#',
+  'йЙ;qQ', 'цЦ;wW', 'уУ;eE', 'кК;rR', 'еЕ;tT', 'нН;yY', 'гГ;uU', 'шШ;iI', 'щЩ;oO', 'зЗ;pP', 'хХ;[{', 'ъЪ;]}',
+  'фФ;aA', 'ыЫ;sS', 'вВ;dD', 'аА;fF', 'пП;gG', 'рР;hH', 'оО;jJ', 'лЛ;kK', 'дД;lL', [[жЖ;\;:]], [[эЭ;'\"]],
+  'яЯ;zZ', 'чЧ;xX', 'сС;cC', 'мМ;vV', 'иИ;bB', 'тТ;nN', 'ьЬ;mM', [[бБ;\,<]], 'юЮ;.>',
+}
+vim.o.langmap = table.concat(langmap_keys, ",")
+-- }}}
+-- {{{ commenting
+map("n", "gco", "o<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Below" })
+map("n", "gcO", "O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Above" })
+-- }}}
+-- change current line without yanking it{{{
+map("n", "<leader>c", '"_cc') -- }}}

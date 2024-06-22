@@ -1,180 +1,120 @@
-Is_Enabled = require("config.functions").is_enabled
-
 return {
-	-- {{{ bullets.nvim
+  -- {{{ mini.pairs
+  {
+    "echasnovski/mini.pairs",
+    event = "InsertEnter",
+    keys = {
+      {
+        "<leader>up",
+        function()
+          vim.g.minipairs_disable = not vim.g.minipairs_disable
 
-	{
-		"dkarter/bullets.vim",
-		ft = "markdown",
-		enabled = Is_Enabled("bullets.vim"),
-	},
-
-	-- ----------------------------------------------------------------------- }}}
-	-- {{{ Comment.nvim
-	{
-		"numToStr/Comment.nvim",
-		event = { "BufReadPost", "BufNewFile" },
-		enabled = Is_Enabled("comment.nvim"),
-		opts = {
-			padding = true,
-			sticky = true,
-			ignore = nil,
-			toggler = {
-				line = "gcc",
-				block = "gbc",
-			},
-			opleader = {
-				line = "gc",
-				block = "gb",
-			},
-			extra = {
-				above = "gc0",
-				below = "gco",
-				eol = "gcA",
-			},
-			mappings = {
-				basic = true,
-				extra = true,
-			},
-			pre_hook = nil,
-			post_hook = nil,
-		},
-
-		config = function(_, opts)
-			require("Comment").setup(opts)
-		end,
-	},
-	-- ----------------------------------------------------------------------- }}}
-	-- {{{ nvim-autopairs
-	{
-		"windwp/nvim-autopairs",
-		event = { "BufReadPost", "BufNewFile" },
-		enabled = Is_Enabled("nvim-autopairs"),
-		config = true,
-	},
-	-- ----------------------------------------------------------------------- }}}
-	-- {{{ vim-visual-multi
-	{
-		"mg979/vim-visual-multi",
-		event = { "BufReadPost", "BufNewFile" },
-		enabled = Is_Enabled("vim-visual-multi"),
-	},
-	-- ----------------------------------------------------------------------- }}}
-	-- {{{ flash.nvim
-	{
-		"folke/flash.nvim",
-		keys = {
-			{
-				"<leader>/",
-				function()
-					(require("flash")).jump()
-				end,
-				mode = { "n", "x", "o" },
-			},
-		},
-		opts = {
-			lables = "asdfghjklqwertyuiopzxcvbnm",
-			modes = {
-				char = { enabled = false },
-				search = {
-					enabled = true,
-					search = {
-						enabled = true,
-						incremental = true,
-					},
-				},
-				treesitter = { enabled = false },
-			},
-			label = {
-				uppercase = false,
-				rainbow = { enalbed = false, shade = 5 },
-				after = false,
-				before = true,
-				style = "inline",
-			},
-		},
-		config = true,
-		enabled = Is_Enabled("flash.nvim"),
-	},
-	-- }}}
-	-- {{{ mini.surround
-	{
-		"VKTRenokh/mini.surround",
-		keys = {
-			{ "sa", mode = { "n", "x", "v" } }, -- Add surrounding in Normal and Visual modes
-			{ "sd", mode = { "n", "x", "v" } }, -- Delete surrounding
-			{ "sh", mode = { "n", "x", "v" } }, -- Highlight surrounding
-			{ "sr", mode = { "n", "x", "v" } }, -- Replace surrounding
-			{ "sn", mode = { "n", "x", "v" } }, -- Update `n_lines`
-		},
-		opts = {
-			{
-				-- Add custom surroundings to be used on top of builtin ones. For more
-				-- information with examples, see `:h MiniSurround.config`.
-				custom_surroundings = nil,
-
-				-- Duration (in ms) of highlight when calling `MiniSurround.highlight()`
-				highlight_duration = 500,
-
-				-- Module mappings. Use `''` (empty string) to disable one.
-				mappings = {
-					add = "sa", -- Add surrounding in Normal and Visual modes
-					delete = "sd", -- Delete surrounding
-					highlight = "sh", -- Highlight surrounding
-					replace = "sr", -- Replace surrounding
-					update_n_lines = "sn", -- Update `n_lines`
-					find = "su", -- Find surrounding (to the right)
-					find_left = "sU", -- Find surrounding (to the left)
-
-					suffix_last = "l", -- Suffix to search with "prev" method
-					suffix_next = "n", -- Suffix to search with "next" method
-				},
-
-				-- Number of lines within which surrounding is searched
-				n_lines = 20,
-
-				-- Whether to respect selection type:
-				-- - Place surroundings on separate lines in linewise mode.
-				-- - Place surroundings on each line in blockwise mode.
-				respect_selection_type = false,
-
-				-- How to search for surrounding (first inside current line, then inside
-				-- neighborhood). One of 'cover', 'cover_or_next', 'cover_or_prev',
-				-- 'cover_or_nearest', 'next', 'prev', 'nearest'. For more details,
-				-- see `:h MiniSurround.config`.
-				search_method = "cover",
-
-				-- Whether to disable showing non-error feedback
-				silent = false,
-			},
-		},
-		config = true,
-		enabled = Is_Enabled("mini-surround"),
-	},
-	-- }}}
-	{ -- {{{ refactoring.nvim
-		"ThePrimeagen/refactoring.nvim",
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-			"nvim-treesitter/nvim-treesitter",
-		},
-		keys = {
-			{
-				"<leader>rn",
-				function()
-					require("refactoring").select_refactor({
-						show_success_message = true,
-					})
-				end,
-				mode = "v",
-				noremap = true,
-				silent = true,
-				expr = false,
-			},
-		},
-		opts = {},
-		config = function(_, opts)
-			require("refactoring").setup(opts)
-		end,
-	}, -- }}}
+          require("config.functions").notify(
+            (vim.g.minipairs_disable and "Disabled" or "Enabled") .. " " .. "mini.nvim"
+          )
+        end,
+      },
+    },
+    opts = {},
+  },
+  -- ----------------------------------------------------------------------- }}}
+  -- {{{ mini.surround
+  {
+    "echasnovski/mini.surround",
+    keys = {
+      { "sa", mode = { "v", "n" }, desc = "Add surrounding" },
+      { "sd", desc = "Delete surrounding" },
+      { "sh", desc = "Highlight closest surrounding" },
+      { "sr", mode = { "v", "n" }, desc = "Replace surrounding" },
+      { "sn", desc = "Update surroundings in n_lines" },
+    },
+    opts = {
+      mappings = {
+        find = "",
+        find_left = "",
+      },
+    },
+  },
+  -- }}}
+  -- {{{ mini.ai - better vim a/i motions
+  {
+    "echasnovski/mini.ai",
+    event = "LazyFile",
+    opts = function()
+      local ai = require("mini.ai")
+      return {
+        n_lines = 500,
+        custom_textobjects = {
+          o = ai.gen_spec.treesitter({ -- code block
+            a = { "@block.outer", "@conditional.outer", "@loop.outer" },
+            i = { "@block.inner", "@conditional.inner", "@loop.inner" },
+          }),
+          f = ai.gen_spec.treesitter({ a = "@function.outer", i = "@function.inner" }), -- function
+          c = ai.gen_spec.treesitter({ a = "@class.outer", i = "@class.inner" }), -- class
+          t = { "<([%p%w]-)%f[^<%w][^<>]->.-</%1>", "^<.->().*()</[^/]->$" }, -- tags
+          d = { "%f[%d]%d+" }, -- digits
+          e = { -- Word with case
+            {
+              "%u[%l%d]+%f[^%l%d]",
+              "%f[%S][%l%d]+%f[^%l%d]",
+              "%f[%P][%l%d]+%f[^%l%d]",
+              "^[%l%d]+%f[^%l%d]",
+            },
+            "^().*()$",
+          },
+          u = ai.gen_spec.function_call(), -- u for "Usage"
+          U = ai.gen_spec.function_call({ name_pattern = "[%w_]" }), -- without dot in function name
+        },
+      }
+    end,
+  },
+  -- }}}
+  -- {{{ nvim-snippasta
+  {
+    "mfussenegger/nvim-snippasta",
+    keys = {
+      {
+        "<leader>p",
+        function()
+          require("snippasta").paste()
+        end,
+      },
+      {
+        "<Tab>",
+        function()
+          vim.snippet.jump(1)
+        end,
+        noremap = true,
+        mode = { "i" },
+      },
+    },
+  }, -- }}}
+  -- {{{ todo-comments.nvim
+  {
+    "folke/todo-comments.nvim",
+    event = "LazyFile",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    keys = {
+      {
+        "]t",
+        function()
+          require("todo-comments").jump_next()
+        end,
+        desc = "Jump to the next todo comment (folke/todo-comments.nvim)",
+      },
+      {
+        "[t",
+        function()
+          require("todo-comments").jump_prev()
+        end,
+        desc = "Jump to the previous todo comment (folke/todo-comments.nvim)",
+      },
+      {
+        ";d",
+        "<Cmd>TodoTelescope<cr>",
+      },
+    },
+    opts = {},
+    config = true,
+  }, -- }}}
 }

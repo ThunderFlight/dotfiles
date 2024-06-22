@@ -1,126 +1,65 @@
-Customize = require("config.customize")
-Keymap = vim.keymap
+local function augroup(name)
+  return vim.api.nvim_create_augroup("vvim" .. name, { clear = true })
+end
 
--- {{{ Clear items that make transparency look bad.
-
-vim.api.nvim_create_autocmd("BufEnter", {
-	callback = function()
-		vim.cmd([[highlight Normal guibg=NONE]])
-
-		vim.cmd([[ highlight Folded guibg=NONE]])
-
-		if Customize.virtcolumn_nvim then
-			vim.cmd([[ highlight ColorColumn guibg=#292d42 ]])
-		else
-			vim.cmd([[ highlight ColorColumn guibg=#202031 ]])
-		end
-
-		vim.cmd([[ highlight LineNr guifg=#e0af68 ]])
-		vim.cmd([[ highlight LineNrAbove guifg=#787c99 ]])
-		vim.cmd([[ highlight LineNrBelow guifg=#787c99 ]])
-	end,
+-- {{{ Q to exit some filetypes
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = {
+    "PlenaryTestPopup",
+    "help",
+    "lspinfo",
+    "notify",
+    "qf",
+    "query",
+    "spectre_panel",
+    "startuptime",
+    "tsplayground",
+    "neotest-output",
+    "checkhealth",
+    "neotest-summary",
+    "neotest-output-panel",
+  },
+  callback = function(event)
+    vim.bo[event.buf].buflisted = false
+    vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = event.buf, silent = true })
+  end,
 })
-
--- ------------------------------------------------------------------------- }}}
--- {{{ Close some filetypes with <q>.
-
-vim.api.nvim_create_autocmd("Filetype", {
-	pattern = {
-		"alpha",
-		"PlenaryTestPopup",
-		"dashboard",
-		"fugitive",
-		"help",
-		"lspinfo",
-		"man",
-		"mason",
-		"notify",
-		"qf",
-		"spectre_panel",
-		"startuptime",
-		"tsplayground",
-	},
-	callback = function(event)
-		vim.bo[event.buf].buflisted = false
-		Keymap.set("n", "q", "<cmd>close<cr>", { buffer = event.buf, silent = true })
-	end,
-})
--- ------------------------------------------------------------------------- }}}
--- {{{ Format options
-
-vim.api.nvim_create_autocmd("BufEnter", {
-	callback = function()
-		vim.cmd([[ setlocal formatoptions+=c ]])
-		vim.cmd([[ setlocal formatoptions+=j ]])
-		vim.cmd([[ setlocal formatoptions+=n ]])
-		vim.cmd([[ setlocal formatoptions+=q ]])
-		vim.cmd([[ setlocal formatoptions+=r ]])
-		vim.cmd([[ setlocal formatoptions-=2 ]])
-		vim.cmd([[ setlocal formatoptions-=a ]])
-		vim.cmd([[ setlocal formatoptions-=o ]])
-		vim.cmd([[ setlocal formatoptions-=t ]])
-	end,
-})
--- ------------------------------------------------------------------------- }}}
--- {{{ Goto last location when opening a buffer.
-vim.api.nvim_create_autocmd("BufReadPost", {
-	callback = function()
-		local mark = vim.api.nvim_buf_get_mark(0, '"')
-		local lcount = vim.api.nvim_buf_line_count(0)
-		if mark[1] > 0 and mark[1] <= lcount then
-			pcall(vim.api.nvim_win_set_cursor, 0, mark)
-		end
-	end,
-})
--- ------------------------------------------------------------------------- }}}
--- {{{ Hightlight on yank
+-- }}}
+-- {{{ Yank on highlight
 local highlight_group = vim.api.nvim_create_augroup("YankHighlight", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
-	callback = function()
-		vim.highlight.on_yank()
-	end,
-	group = highlight_group,
-	pattern = "*",
+  callback = function()
+    vim.highlight.on_yank()
+  end,
+  group = highlight_group,
+  pattern = "*",
 })
--- ------------------------------------------------------------------------- }}}
--- {{{ json
-local json_group = vim.api.nvim_create_augroup("Json", { clear = true })
-vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-	command = [[syntax match Comment +\/\/.\+$+]],
-	group = json_group,
-	pattern = "*.json",
-})
--- ------------------------------------------------------------------------- }}}
--- {{{ Reload file when necessay.
-
-vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, { command = "checktime" })
-
--- ------------------------------------------------------------------------- }}}
--- {{{ Resize splits when window is resized.
-
+-- }}}
+-- {{{ Automaticly resize splits
 vim.api.nvim_create_autocmd({ "VimResized" }, {
-	callback = function()
-		vim.cmd("tabdo wincmd =")
-	end,
+  group = augroup("resize_splits"),
+  callback = function()
+    local currentTab = vim.fn.tabpagenr()
+    vim.cmd("tabdo wincmd =")
+    vim.cmd("tabnext " .. currentTab)
+  end,
 })
-
--- ------------------------------------------------------------------------- }}}
--- {{{ Set spelling for some file types.
-
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = { "gitcommit", "wiki" },
-	callback = function()
-		vim.opt_local.spell = true
-	end,
+-- }}}
+-- {{{ Open last location
+vim.api.nvim_create_autocmd("BufReadPost", {
+  group = augroup("last_loc"),
+  callback = function(event)
+    local exclude = { "gitcommit" }
+    local buf = event.buf
+    if vim.tbl_contains(exclude, vim.bo[buf].filetype) or vim.b[buf].lazyvim_last_loc then
+      return
+    end
+    vim.b[buf].lazyvim_last_loc = true
+    local mark = vim.api.nvim_buf_get_mark(buf, '"')
+    local lcount = vim.api.nvim_buf_line_count(buf)
+    if mark[1] > 0 and mark[1] <= lcount then
+      pcall(vim.api.nvim_win_set_cursor, 0, mark)
+    end
+  end,
 })
-
--- ------------------------------------------------------------------------- }}}
--- {{{ WhiteSpace
-
-local whitespace_group = vim.api.nvim_create_augroup("WhiteSpace", { clear = true })
-vim.api.nvim_create_autocmd("BufWritePre", {
-	command = [[%s/\s\+$//e]],
-	group = whitespace_group,
-})
-
--- ------------------------------------------------------------------------- }}}
+-- }}}
