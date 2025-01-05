@@ -1,7 +1,7 @@
 {
   "layer": "top", // Waybar at top layer
   "position": "top", // Waybar position (top|bottom|left|right)
-  "height": 40,
+  "height": 32,
   "width": 1900,
   "margin-bottom": 5,
   "spacing": 0,
@@ -20,8 +20,7 @@
     "pulseaudio",
     "backlight",
     "custom/cycle_wall",
-    "hyprland/language",
-    "tray"
+    "hyprland/language"
   ],
   "modules-center": [
     "clock",
@@ -112,7 +111,7 @@
   "hyprland/language": {
     "format": " {}",
     "format-en": "Us",
-    "format-es": "Es",
+    "format-ua": "Ua",
     "keyboard-name": "sonix-usb-device",
     "max-length": 5,
     "min-length": 5,

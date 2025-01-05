@@ -2,13 +2,12 @@
   font-family: "JetBrainsMono Nerd Font";
   font-size: 17px;
   /* font-weight: bold; */
-  border-radius: 0px;
   margin: 0;
 }
 
 window#waybar {
-  background-color: transparent;
-  border-radius: 10px;
+  background-color: #45403d;
+  border-radius: 5px;
   padding-top: 0px;
   margin-top: 0;
 }
@@ -24,8 +23,6 @@ window#waybar {
 .modules-left {
   margin-left: 0.1rem;
   background-color: #45403d;
-  margin-top: 5px;
-  margin-bottom: 5px;
   padding: 1px 0px;
   border-radius: 10px;
 }
@@ -52,8 +49,8 @@ tooltip * {
 
 #workspaces {
   margin: 1px;
-  margin-right: 0.3rem;
-  margin-left: 0.3rem;
+  margin-right: 0.1rem;
+  margin-left: 0.1rem;
 }
 
 #workspaces button {
@@ -66,8 +63,6 @@ tooltip * {
 }
 
 #workspaces button:hover {
-  box-shadow: inherit;
-  text-shadow: inherit;
   background-color: #d4be98;
   color: #45403d;
   border-radius: 3px;
@@ -76,7 +71,6 @@ tooltip * {
 #workspaces button.active {
   color: #ebdbb2;
   background-color: rgba(125, 174, 163, 0.9);
-  text-shadow: 0 0 5px rgba(0, 0, 0, 0.818);
   transition: all 0.1s ease-in-out;
   border-radius: 3px;
 }
@@ -86,7 +80,6 @@ tooltip * {
 #custom-updates {
   font-family: "GE Inspira";
   font-weight: bolder;
-  text-shadow: 0 0 5px rgb(0, 0, 0);
   color: #d4be98;
   background-color: #45403d;
 }

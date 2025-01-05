@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+waypaper --folder ~/.config/hypr/wallpapers/ 
+
