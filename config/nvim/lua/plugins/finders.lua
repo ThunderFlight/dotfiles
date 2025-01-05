@@ -17,12 +17,14 @@ return {
       { "gr", "<Cmd>Telescope lsp_references<cr>", desc = "Open telescope with lsp references" },
       { "gK", "<Cmd>Telescope lsp_implementations<cr>", desc = "lsp implementations" },
       { "gt", "<Cmd>Telescope lsp_type_definitions<cr>", desc = "Lsp type defenetions" },
+      {";j", "<Cmd>Telsecope jumplist<cr>", desc = "Open telescope with jumplist"},
       -- stylua: ignore end
     }, -- }}}
     cmd = "Telescope",
     version = false,
     dependencies = {
       "nvim-lua/plenary.nvim",
+      "echasnovski/mini.icons",
     },
     opts = function()
       local actions = require("telescope.actions")
@@ -105,4 +107,15 @@ return {
     end,
   },
   -- ----------------------------------------------------------------------- }}}
+  -- {{{
+  {
+    "nvim-telescope/telescope-frecency.nvim",
+    keys = {
+      { ";h", "<Cmd>:Telescope frecency<cr>" },
+    },
+    config = function()
+      require("telescope").load_extension("frecency")
+    end,
+  },
+  -- }}}
 }

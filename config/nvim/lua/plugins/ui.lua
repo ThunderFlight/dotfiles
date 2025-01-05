@@ -1,108 +1,22 @@
 Icons = require("config.constants").icons
 
 return {
-  -- {{{ alpha.nvim
-  {
-    "goolord/alpha-nvim",
-    keys = {
-      { "<leader>aa", "<cmd>Alpha<cr>", desc = "Open alpha" },
-    },
-    event = { "VimEnter", "BufReadPost", "BufNewFile" },
-    opts = function()
-      local dashboard = require("alpha.themes.dashboard")
-      local logo = [[
-       _______             ____   ____.__
-       \      \   ____  ___\   \ /   /|__| _____
-       /   |   \_/ __ \/  _ \   Y   / |  |/     \
-      /    |    \  ___(  <_> )     /  |  |  Y Y  \
-      \____|__  /\____ >____/ \___/   |__|__|_|  /
-              \/                               \/
-      ]]
-
-      dashboard.section.header.val = vim.split(logo, "\n", {})
-      dashboard.section.buttons.val = {
-        dashboard.button("f", Icons.documents.Files .. " Find file", ":Telescope find_files <CR>"),
-        dashboard.button("r", Icons.ui.History .. " Recent files", ":Telescope oldfiles <CR>"),
-        dashboard.button("t", Icons.ui.List .. " Find text", ":Telescope live_grep <CR>"),
-        dashboard.button("c", Icons.ui.Gear .. " Config", ":e ~/.config/nvim/init.lua | cd ~/.config/nvim<CR>"),
-        dashboard.button("u", Icons.ui.CloudDownload .. " Update", ":Lazy<CR>"),
-        dashboard.button("q", Icons.ui.SignOut .. " Quit", ":qa<CR>"),
-      }
-
-      for _, button in ipairs(dashboard.section.buttons.val) do
-        button.opts.hl = "AlphaButtons"
-        button.opts.hl_shortcut = "AlphaShortcut"
-      end
-
-      dashboard.section.header.opts.hl = "AlphaHeader"
-      dashboard.section.buttons.opts.hl = "AlphaButtons"
-      dashboard.section.footer.opts.hl = "Type"
-      dashboard.opts.opts.noautocmd = true
-      return dashboard
-    end,
-    config = function(_, dashboard)
-      -- close Lazy and re-open when the dashboard is ready
-      if vim.o.filetype == "lazy" then
-        vim.cmd.close()
-        vim.api.nvim_create_autocmd("User", {
-          pattern = "AlphaReady",
-          callback = function()
-            require("lazy").show()
-          end,
-        })
-      end
-      require("alpha").setup(dashboard.opts)
-
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "LazyVimStarted",
-        callback = function()
-          local footerLogo = [[
-       ⣇⣿⠘⣿⣿⣿⡿⡿⣟⣟⢟⢟⢝⠵⡝⣿⡿⢂⣼⣿⣷⣌⠩⡫⡻⣝⠹⢿⣿⣷
-       ⡆⣿⣆⠱⣝⡵⣝⢅⠙⣿⢕⢕⢕⢕⢝⣥⢒⠅⣿⣿⣿⡿⣳⣌⠪⡪⣡⢑⢝⣇
-       ⡆⣿⣿⣦⠹⣳⣳⣕⢅⠈⢗⢕⢕⢕⢕⢕⢈⢆⠟⠋⠉⠁⠉⠉⠁⠈⠼⢐⢕⢽
-       ⡗⢰⣶⣶⣦⣝⢝⢕⢕⠅⡆⢕⢕⢕⢕⢕⣴⠏⣠⡶⠛⡉⡉⡛⢶⣦⡀⠐⣕⢕
-       ⡝⡄⢻⢟⣿⣿⣷⣕⣕⣅⣿⣔⣕⣵⣵⣿⣿⢠⣿⢠⣮⡈⣌⠨⠅⠹⣷⡀⢱⢕
-       ⡝⡵⠟⠈⢀⣀⣀⡀⠉⢿⣿⣿⣿⣿⣿⣿⣿⣼⣿⢈⡋⠴⢿⡟⣡⡇⣿⡇⡀⢕
-       ⡝⠁⣠⣾⠟⡉⡉⡉⠻⣦⣻⣿⣿⣿⣿⣿⣿⣿⣿⣧⠸⣿⣦⣥⣿⡇⡿⣰⢗⢄
-       ⠁⢰⣿⡏⣴⣌⠈⣌⠡⠈⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣬⣉⣉⣁⣄⢖⢕⢕⢕
-       ⡀⢻⣿⡇⢙⠁⠴⢿⡟⣡⡆⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣵⣵⣿
-       ⡻⣄⣻⣿⣌⠘⢿⣷⣥⣿⠇⣿⣿⣿⣿⣿⣿⠛⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
-       ⣷⢄⠻⣿⣟⠿⠦⠍⠉⣡⣾⣿⣿⣿⣿⣿⣿⢸⣿⣦⠙⣿⣿⣿⣿⣿⣿⣿⣿⠟
-       ⡕⡑⣑⣈⣻⢗⢟⢞⢝⣻⣿⣿⣿⣿⣿⣿⣿⠸⣿⠿⠃⣿⣿⣿⣿⣿⣿⡿⠁⣠
-       ⡝⡵⡈⢟⢕⢕⢕⢕⣵⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣿⣿⣿⣿⣿⠿⠋⣀⣈⠙
-       ⡝⡵⡕⡀⠑⠳⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠛⢉⡠⡲⡫⡪⡪⡣
-          ]]
-          local stats = require("lazy").stats()
-          local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
-          dashboard.section.footer.val = " Neovim loaded "
-              .. stats.loaded
-              .. "/"
-              .. stats.count
-              .. " plugins in "
-              .. ms
-              .. "ms"
-              .. "\n"
-              .. footerLogo
-          pcall(vim.cmd.AlphaRedraw)
-        end,
-      })
-    end,
-  },
-  -- ----------------------------------------------------------------------- }}}
   -- {{{ bufferline.nvim
   {
     "akinsho/bufferline.nvim",
     enabled = true,
     keys = {
-      { "te",         "<cmd>:tabedit<cr>",            desc = "Create new tab" },
-      { "<Tab>",      "<Cmd>BufferLineCycleNext<CR>", desc = "Cycle tabs forwards" },
-      { "gt",         "<cmd>BufferLinePick<cr>",      desc = "Pick tab" },
-      { "gT",         "<cmd>BufferLinePickClose<cr>", desc = "Pick tab to close" },
-      { "gtd",        "<cmd>BufferLineClose<cr>",     desc = "Close all tabs" },
-      { "<S-Tab>",    "<Cmd>BufferLineCyclePrev<CR>", desc = "Cycle tabs backwards" },
-      { "<C-Tab>",    "<cmd>tablast<cr>",             desc = "Jump to the last tab" },
-      { "<C-S-Tab>",  "<cmd>tabfirst<cr>",            desc = "Jump to the first tab" },
+      { "te", "<cmd>:tabedit<cr>", desc = "Create new tab" },
+      { "<Tab>", "<Cmd>BufferLineCycleNext<CR>", desc = "Cycle tabs forwards" },
+      { "gt", "<cmd>BufferLinePick<cr>", desc = "Pick tab" },
+      { "gT", "<cmd>BufferLinePickClose<cr>", desc = "Pick tab to close" },
+      { "gtd", "<cmd>BufferLineClose<cr>", desc = "Close all tabs" },
+      { "<S-Tab>", "<Cmd>BufferLineCyclePrev<CR>", desc = "Cycle tabs backwards" },
+      { "<C-Tab>", "<cmd>tablast<cr>", desc = "Jump to the last tab" },
+      { "<C-S-Tab>", "<cmd>tabfirst<cr>", desc = "Jump to the first tab" },
       { "<leader>tp", "<cmd>BufferLineTogglePin<cr>", desc = "Pin tab" },
+      { "[B", "<cmd>BufferLineMovePrev<cr>", desc = "Move buffer prev" },
+      { "]B", "<cmd>BufferLineMoveNext<cr>", desc = "Move buffer next" },
     },
     opts = {
       options = {
@@ -116,7 +30,7 @@ return {
         diagnostics_indicator = function(_, _, diag)
           local icons = Constants.icons.diagnostics
           local ret = (diag.error and icons.Error .. diag.error .. " " or "")
-              .. (diag.warning and icons.Warning .. diag.warning or "")
+            .. (diag.warning and icons.Warning .. diag.warning or "")
           return vim.trim(ret)
         end,
       },
@@ -181,7 +95,7 @@ return {
         follow_files = true,
       },
       attach_to_untracked = true,
-      current_line_blame = false,
+      current_line_blame = true,
       current_line_blame_opts = {
         virt_text = true,
         virt_text_pos = "eol",
@@ -207,9 +121,12 @@ return {
   {
     "lukas-reineke/indent-blankline.nvim",
     event = "LazyFile",
-    enabled = true, -- enable when plugin author fixes it
+    enabled = true,
+    keys = {
+      { "<leader>di", "<Cmd>IBLToggle<cr>", desc = "Toggle indention guides" },
+    },
     opts = {
-      indent = { char = "│" },
+      indent = {}, -- 
       scope = {
         show_start = false,
       },
@@ -221,7 +138,7 @@ return {
   {
     "nvim-lualine/lualine.nvim",
     event = "LazyFile",
-    enabled = true,
+    enabled = false,
     opts = function(_, opts)
       local hide_in_width = function()
         return vim.fn.winwidth(0) > 80
@@ -286,7 +203,7 @@ return {
         local current_line = vim.fn.line(".")
         local total_lines = vim.fn.line("$")
         local chars =
-        { "__", "▁▁", "▂▂", "▃▃", "▄▄", "▅▅", "▆▆", "▇▇", "██" }
+          { "__", "▁▁", "▂▂", "▃▃", "▄▄", "▅▅", "▆▆", "▇▇", "██" }
         local line_ratio = current_line / total_lines
         local index = math.ceil(line_ratio * #chars)
         return chars[index]
@@ -421,7 +338,7 @@ return {
         },
       },
       presets = {
-        bottom_search = true,
+        bottom_search = false,
         long_message_to_split = true,
         lsp_doc_border = true,
       },
@@ -466,14 +383,26 @@ return {
     },
   },
   -- ----------------------------------------------------------------------- }}}
-  -- {{{ nvim-web-devicons
-
+  -- {{{ mini.icons
   {
-    "nvim-tree/nvim-web-devicons",
+    "echasnovski/mini.icons",
     lazy = true,
-    opts = {},
+    opts = {
+      file = {
+        [".keep"] = { glyph = "󰊢", hl = "MiniIconsGrey" },
+        ["devcontainer.json"] = { glyph = "", hl = "MiniIconsAzure" },
+      },
+      filetype = {
+        dotenv = { glyph = "", hl = "MiniIconsYellow" },
+      },
+    },
+    init = function()
+      package.preload["nvim-web-devicons"] = function()
+        require("mini.icons").mock_nvim_web_devicons()
+        return package.loaded["nvim-web-devicons"]
+      end
+    end,
   },
-
   -------------------------------------------------------------------------- }}}}
   -- {{{ trouble.nvim
 
@@ -482,10 +411,10 @@ return {
     cmd = "Trouble",
     keys = {
       --stylua: ignore start
-      { "<leader>t",  "<Cmd>Trouble diagnostics<cr>", desc = "Open trouble diagnostics", },
-      { "<leader>T",  "<cmd>Trouble<cr>",             desc = "Open trouble selection menu", },
+      { "<leader>t", "<Cmd>Trouble diagnostics<cr>", desc = "Open trouble diagnostics", },
+			{ "<leader>T", "<cmd>Trouble<cr>", desc = "Open trouble selection menu", },
       -- stylua: ignore end
-      { "<leader>cl", "<cmd>Trouble lsp<cr>",         desc = "Open trouble with lsp" },
+      { "<leader>cl", "<cmd>Trouble lsp<cr>", desc = "Open trouble with lsp" },
     },
     opts = {
       use_diagnostic_signs = true,
@@ -493,8 +422,67 @@ return {
       open_no_results = true,
       warn_no_results = false,
       focus = true,
+      keys = {
+        gb = {
+          action = function(view)
+            view:filter({ buf = 0 }, { toggle = true })
+          end,
+          desc = "Toggle Current Buffer Filter (trouble)",
+        },
+      },
     },
   },
 
   -- ----------------------------------------------------------------------- }}}
+  -- {{{ tiny-inline-diagnostic.nvim
+  {
+    "rachartier/tiny-inline-diagnostic.nvim",
+    event = "LazyFile",
+    enabled = true,
+    config = function()
+      vim.diagnostic.config({ virtual_text = false })
+
+      require("tiny-inline-diagnostic").setup()
+    end,
+  }, -- }}}
+  -- {{{ markdown.nvim
+  {
+    "MeanderingProgrammer/render-markdown.nvim",
+    opts = {},
+    dependencies = { "nvim-treesitter/nvim-treesitter", "echasnovski/mini.icons" }, -- if you use the mini.nvim suite
+    ft = "markdown",
+  },
+  -- }}}
+  -- {{{ colorful-winsep
+  {
+    "nvim-zh/colorful-winsep.nvim",
+    event = { "LazyFile" },
+    config = true,
+  },
+  -- }}}
+  -- {{{ snacks.nvim
+  {
+    "folke/snacks.nvim",
+    priority = 1000,
+    lazy = false,
+    opts = {
+      bigfile = { enabled = true },
+      notifier = { enabled = true },
+      quickfile = { enabled = true },
+      statuscolumn = { enabled = false },
+      dashboard = { enabled = true },
+      words = { enabled = false },
+    },
+  },
+  -- }}}
+  -- {{{ incline.nvim
+  {
+    "b0o/incline.nvim",
+    event = "LazyFile",
+    opts = {},
+    config = function(_, opts)
+      require("incline").setup(opts)
+    end,
+  },
+  -- }}}
 }

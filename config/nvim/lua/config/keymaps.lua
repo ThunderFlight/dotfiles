@@ -103,19 +103,16 @@ map("n", "<leader>to", function()
   vim.opt.scrolloff = 999 - vim.o.scrolloff
 end)
 -- }}}
--- {{{ Vim mappings in russian
--- stylua: ignore
-local langmap_keys = {
-  'ёЁ;`~', '№;#',
-  'йЙ;qQ', 'цЦ;wW', 'уУ;eE', 'кК;rR', 'еЕ;tT', 'нН;yY', 'гГ;uU', 'шШ;iI', 'щЩ;oO', 'зЗ;pP', 'хХ;[{', 'ъЪ;]}',
-  'фФ;aA', 'ыЫ;sS', 'вВ;dD', 'аА;fF', 'пП;gG', 'рР;hH', 'оО;jJ', 'лЛ;kK', 'дД;lL', [[жЖ;\;:]], [[эЭ;'\"]],
-  'яЯ;zZ', 'чЧ;xX', 'сС;cC', 'мМ;vV', 'иИ;bB', 'тТ;nN', 'ьЬ;mM', [[бБ;\,<]], 'юЮ;.>',
-}
-vim.o.langmap = table.concat(langmap_keys, ",")
--- }}}
 -- {{{ commenting
 map("n", "gco", "o<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Below" })
 map("n", "gcO", "O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Above" })
 -- }}}
 -- change current line without yanking it{{{
 map("n", "<leader>c", '"_cc') -- }}}
+-- {{{ <C-i> fix
+-- When mapping <Tab> this keymap looses it's functionality so you have to
+-- remap it to itself
+map("n", "<C-i>", "<C-i>") -- }}}
+map("n", "<leader>dt", "<Cmd>:pu=strftime('%c')<cr>")
+
+map("n", "<leader>in", "<Cmd>:set fo-=tc<cr>")

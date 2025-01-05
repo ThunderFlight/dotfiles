@@ -27,6 +27,29 @@ return {
         additional_vim_regex_highlighting = true,
       },
       textobjects = {
+        move = {
+          enable = true,
+          goto_next_start = {
+            ["]f"] = "@function.outer",
+            ["]c"] = "@class.outer",
+            ["]a"] = "@parameter.inner",
+          },
+          goto_next_end = {
+            ["]F"] = "@function.outer",
+            ["]C"] = "@class.outer",
+            ["]A"] = "@parameter.inner",
+          },
+          goto_previous_start = {
+            ["[f"] = "@function.outer",
+            ["[c"] = "@class.outer",
+            ["[a"] = "@parameter.inner",
+          },
+          goto_previous_end = {
+            ["[F"] = "@function.outer",
+            ["[C"] = "@class.outer",
+            ["[A"] = "@parameter.inner",
+          },
+        },
         select = {
           enable = true,
           lookahead = true,
@@ -41,13 +64,6 @@ return {
         },
       },
       indent = { enable = false, disable = { "yml", "yaml" } },
-      rainbow = {
-        enable = true,
-        extended_mode = false,
-        max_file_lines = nil,
-        query = "rainbow-parens",
-        -- colors = Constants.colors.rainbow,
-      },
       disable = { "latex" },
       ensure_installed = Constants.ensure_installed.treesitter,
       incremental_selection = {
@@ -98,22 +114,6 @@ return {
     },
   },
   -- ----------------------------------------------------------------------- }}}
-  -- {{{ rainbow-delimiters
-  {
-    "HiPhish/rainbow-delimiters.nvim",
-    opts = {
-      blacklist = {
-        "vue",
-        "html",
-        "jsx",
-        "tsx",
-      },
-    },
-    enabled = true,
-    event = "LazyFile",
-    main = "rainbow-delimiters.setup",
-  },
-  -- }}}
   -- {{{ tokyonight.nvim
   {
     "folke/tokyonight.nvim",
@@ -123,6 +123,7 @@ return {
     opts = {
       transparent = true,
       style = "moon",
+      dim_inactive = true,
       styles = {
         sidebars = "transparent",
         floats = "transparent",
@@ -139,6 +140,8 @@ return {
           { "NoiceCmdlinePopupBorder", "TelescopePromptBorder", "TelescopePromptTitle" }
 
         util.each(border_highlights, util.set(highlights, fg(colors.border_highlight)))
+
+        highlights.Folded.bg = "none"
       end,
     },
     config = function(_, opts)
@@ -148,30 +151,36 @@ return {
     end,
   },
   -- ----------------------------------------------------------------------- }}}
-  -- {{{ mini.hipatternsk
+  -- {{{ mini.hipatterns
   {
     "echasnovski/mini.hipatterns",
     event = "LazyFile",
-    opts = {},
+    opts = function()
+      local hl = require("mini.hipatterns")
+      return {
+        highlighters = {
+          hex_color = hl.gen_highlighter.hex_color({ priority = 2000 }),
+        },
+      }
+    end,
     config = function(_, opts)
       require("mini.hipatterns").setup(opts)
     end,
   },
   -- ----------------------------------------------------------------------- }}}
-  -- {{{ rose-pine
+  -- {{{ vague.nvim
   {
-    "https://github.com/rose-pine/neovim.git",
-    name = "rose-pine",
+    "vague2k/vague.nvim",
     lazy = false,
     enabled = false,
-    priority = 1000,
     opts = {
-      variant = "dawn",
+      transparent = true,
     },
     config = function(_, opts)
-      require("rose-pine").setup(opts)
+      require("vague").setup(opts)
 
-      vim.cmd.colorscheme("rose-pine")
+      vim.cmd.colorscheme("vague")
     end,
-  }, -- }}}
+  },
+  -- }}}
 }

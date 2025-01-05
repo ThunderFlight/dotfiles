@@ -1,4 +1,5 @@
 Constants = require("config.constants")
+local map = require("config.functions").keymap
 
 return {
   -- {{{ mason.nvim
@@ -38,7 +39,6 @@ return {
     end,
   },
   -- ----------------------------------------------------------------------- }}}
-  -- {{{ nvim-lspconfig
   {
     "neovim/nvim-lspconfig",
     event = "LazyFile",
@@ -52,7 +52,7 @@ return {
     dependencies = {
       "mason.nvim",
       "williamboman/mason-lspconfig.nvim",
-      "hrsh7th/cmp-nvim-lsp",
+      "saghen/blink.cmp",
     },
     opts = {
       diagnostics = {
@@ -69,23 +69,31 @@ return {
           },
         },
       },
-      capabilities = {},
+      capabilities = {
+        workspace = {
+          fileOperations = {
+            didRename = true,
+            willRename = true,
+          },
+        },
+      },
       servers = {
         jsonls = require("plugins.lsp.jsonls"),
-        vtsls = {
+        vtsls = { -- {{{
+          enabled = true, -- NOTE: disable typescript-language-server if this server is enabled
           filetypes = {
             "javascript",
             "javascriptreact",
             "javascript.jsx",
             "typescript",
             "typescriptreact",
-            "typescript.tsx",
+            "typescript.jsx",
           },
           settings = {
             complete_function_calls = true,
             vtsls = {
-              enabledMoveToFileCodeAction = true,
-              auotUseWorkspaceTskd = true,
+              enableMoveToFileCodeAction = true,
+              autoUseWorkspaceTskd = true,
               experimental = {
                 completion = {
                   enableServerSideFuzzyMatch = true,
@@ -93,27 +101,37 @@ return {
               },
             },
             typescript = {
-              updateImportsOnFileMove = { enabled = "always" },
               suggest = { completeFunctionCalls = true },
+              updateImportsOnFileMove = { enabled = "always" },
+            },
+            inlayHints = {
+              enumMemberValues = { enabled = true },
+              functionLikeReturnTypes = { enabled = true },
+              parameterNames = { enabled = "literals" },
+              parameterTypes = { enabled = true },
+              propertyDeclarationTypes = { enabled = true },
+              variableTypes = { enabled = false },
             },
           },
-        },
+        }, -- }}}}}}
         volar = {
           filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
           init_options = {
-
             vue = {
               hybridMode = false,
             },
           },
         },
-        tsserver = {
-          enabled = false,
+        ts_ls = {
+          enabled = false, -- NOTE: disable tsserver if vtsls is enabled
         },
         lua_ls = {
           settings = {
             Lua = Constants.lua_ls.Lua,
           },
+        },
+        zls = {
+          cmd = { "/home/vktrenokh/.local/bin/zls" },
         },
       },
       setup = {},
@@ -124,58 +142,68 @@ return {
     config = function(_, opts)
       vim.diagnostic.config(opts.diagnostics)
 
-      local servers = opts.servers
+      map("n", "gd", vim.lsp.buf.definition, { desc = "goto defenition" })
 
-      local hasCmp, cmpNvimLsp = pcall(require, "cmp_nvim_lsp")
+      local servers = opts.servers
+      local has_blink, blink = pcall(require, "blink.cmp")
+
       local capabilities = vim.tbl_deep_extend(
         "force",
         {},
         vim.lsp.protocol.make_client_capabilities(),
-        hasCmp and cmpNvimLsp.default_capabilities() or {},
+        has_blink and blink.get_lsp_capabilities() or {},
         opts.capabilities or {}
       )
 
       local function setup(server)
-        local serverOpts = vim.tbl_deep_extend("force", {
+        local server_opts = vim.tbl_deep_extend("force", {
           capabilities = vim.deepcopy(capabilities),
         }, servers[server] or {})
+        if server_opts.enabled == false then
+          return
+        end
 
         if opts.setup[server] then
-          if opts.setup[server](server, serverOpts) then
+          if opts.setup[server](server, server_opts) then
             return
           end
         elseif opts.setup["*"] then
-          if opts.setup["*"](server, serverOpts) then
+          if opts.setup["*"](server, server_opts) then
             return
           end
         end
-
-        require("lspconfig")[server].setup(serverOpts)
+        require("lspconfig")[server].setup(server_opts)
       end
 
-      local hasMason, mlsp = pcall(require, "mason-lspconfig")
-      local allMslpServers = {}
-
-      if hasMason then
-        allMslpServers =
+      -- get all the servers that are available through mason-lspconfig
+      local have_mason, mlsp = pcall(require, "mason-lspconfig")
+      local all_mslp_servers = {}
+      if have_mason then
+        all_mslp_servers =
           vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
       end
 
-      local ensureInstalled = {} ---@type string[]
-      for server, serverOpts in pairs(servers) do
-        if serverOpts then
-          serverOpts = serverOpts == true and {} or serverOpts
-
-          if serverOpts.mason == false or not vim.tbl_contains(allMslpServers, server) then
-            setup(server)
-          elseif serverOpts.enabled ~= false then
-            ensureInstalled[#ensureInstalled + 1] = server
+      local ensure_installed = {} ---@type string[]
+      for server, server_opts in pairs(servers) do
+        if server_opts then
+          server_opts = server_opts == true and {} or server_opts
+          if server_opts.enabled ~= false then
+            -- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
+            if server_opts.mason == false or not vim.tbl_contains(all_mslp_servers, server) then
+              setup(server)
+            else
+              ensure_installed[#ensure_installed + 1] = server
+            end
           end
         end
       end
 
-      if hasMason then
-        mlsp.setup({ ensure_installed = ensureInstalled, handlers = { setup } })
+      if have_mason then
+        mlsp.setup({
+          -- TODO: fix this (Constants.ensure_installed.mason)
+          ensure_installed = vim.tbl_deep_extend("force", ensure_installed, {}),
+          handlers = { setup },
+        })
       end
     end,
   },
